@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{{asset('assets/compiled/css/app-dark.css')}}">
     <link rel="stylesheet" href="{{asset('assets/compiled/css/iconly.css')}}">
     <link rel="stylesheet" href="{{asset('assets/extensions/@fortawesome/fontawesome-free/css/all.min.css')}}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>

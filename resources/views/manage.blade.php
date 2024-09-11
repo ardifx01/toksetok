@@ -17,13 +17,6 @@
                     <button type="submit" class="btn btn-primary">Cari</button>
                 </form>
             </div>
-            <!-- Alert sukses -->
-            @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            @endif
 
             <!-- Tabel Barang -->
             <div class="table-responsive">
@@ -34,10 +27,10 @@
                             <th>Nama Barang</th>
                             <th>
                                 Stok
-                                <a href="{{ route('barang.index', ['sort' => 'stok_asc']) }}"title="Urutkan stok terkecil">
+                                <a href="{{ route('barang.index', ['sort' => 'stok_asc']) }}" title="Urutkan stok terkecil">
                                     <i class="fas fa-arrow-down"></i>
                                 </a>
-                                <a href="{{ route('barang.index', ['sort' => 'stok_desc']) }}"title="Urutkan stok terbesar">
+                                <a href="{{ route('barang.index', ['sort' => 'stok_desc']) }}" title="Urutkan stok terbesar">
                                     <i class="fas fa-arrow-up"></i>
                                 </a>
                             </th>
@@ -143,6 +136,7 @@
             </div>
         </div>
     </div>
+    @include('sweetalert::alert')
 </div>
 
 <!-- Modal Tambah Barang -->

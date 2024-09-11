@@ -71,7 +71,7 @@
             @endforeach
         </table>
     </div>
-
+    @include('sweetalert::alert')
 </div>
 
 <script>

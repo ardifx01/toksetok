@@ -40,7 +40,7 @@
         </div>
         <div class="sidebar-menu">
             <ul class="menu">
-                <li class="sidebar-title">Menu</li>
+                <li class="sidebar-title" style="font-size: 15px; margin-bottom: -2px;">Menu</li>
 
                 <!-- Dashboard Link -->
                 <li class="sidebar-item {{ Route::is('dashboard') ? 'active': '' }}">
@@ -49,13 +49,8 @@
                         <span>Dashboard</span>
                     </a>
                 </li>
-                <li class="sidebar-item {{ Route::is('keranjang.lihat') ? 'active': '' }}">
-                    <a href="{{ route('keranjang.lihat') }}" class='sidebar-link'>
-                        <i class="fas fa-shopping-cart"></i>
-                        <span>Keranjang</span>
-                    </a>
-                </li>
-                <li class="sidebar-title">Management</li>
+                
+                <li class="sidebar-title" style="font-size: 15px; margin-bottom: -2px; margin-top: 25px;">Management</li>
                 <!-- Data Barang Link -->
                 <li class="sidebar-item {{ Route::is('barang.index') ? 'active': '' }}">
                     <a href="{{ route('barang.index') }}" class='sidebar-link'>

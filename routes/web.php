@@ -13,15 +13,4 @@ Route::get('/riwayat/export', [BarangController::class, 'exportRiwayat'])->name(
 Route::get('/riwayat', [BarangController::class, 'riwayat'])->name('riwayat.index');
 Route::get('/search', [BarangController::class, 'search'])->name('barang.search');
 Route::get('/cari', [BarangController::class, 'cari'])->name('cari');
-// Fitur Keranjang
-Route::post('/keranjang/{barang}/tambah', [BarangController::class, 'tambahKeKeranjang'])->name('keranjang.tambah');
-Route::get('/keranjang', [BarangController::class, 'lihatKeranjang'])->name('keranjang.lihat');
-Route::patch('/keranjang/{keranjang}', [BarangController::class, 'updateKeranjang'])->name('keranjang.update');
-Route::delete('/keranjang/{keranjang}', [BarangController::class, 'hapusKeranjang'])->name('keranjang.hapus');
-
-// Checkout Keranjang
-Route::patch('/checkout', [BarangController::class, 'checkout'])->name('keranjang.checkout');
-Route::post('/keranjang/hapus-terpilih', [BarangController::class, 'hapusTerpilih'])->name('keranjang.hapusTerpilih');
-// Tambahkan route untuk hapus terpilih pada riwayat
 Route::delete('/riwayat/hapus-terpilih', [BarangController::class, 'hapusTerpilihRiwayat'])->name('riwayat.hapusTerpilih');
-
