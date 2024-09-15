@@ -49,7 +49,7 @@
                         <span>Dashboard</span>
                     </a>
                 </li>
-                
+
                 <li class="sidebar-title" style="font-size: 15px; margin-bottom: -2px; margin-top: 25px;">Management</li>
                 <!-- Data Barang Link -->
                 <li class="sidebar-item {{ Route::is('barang.index') ? 'active': '' }}">
@@ -58,10 +58,25 @@
                         <span>Barang</span>
                     </a>
                 </li>
-                <li class="sidebar-item {{ Route::is('riwayat.index') ? 'active': '' }}">
-                    <a href="{{ route('riwayat.index') }}" class='sidebar-link'>
+                <li class="sidebar-item has-sub {{ Route::is('riwayat.index') || Route::is('riwayats') ? 'active': '' }}  ? 'active': '' }}">
+                    <a href="#" class='sidebar-link'>
                         <i class="fas fa-history"></i>
                         <span>Riwayat</span>
+                    </a>
+                    <ul class="submenu ">
+                        <li class="submenu-item {{ Route::is('riwayat.index') ? 'active': '' }}">
+                            <a href="{{ route('riwayat.index') }}" class="submenu-link">Stok Keluar</a>
+                        </li>
+                        <li class="submenu-item {{ Route::is('riwayats') ? 'active': '' }} ">
+                            <a href="{{ route('riwayats') }}" class="submenu-link">Stok Masuk</a>
+                        </li>
+                    </ul>
+                </li>
+                <!-- Data Barang Link -->
+                <li class="sidebar-item">
+                    <a href="" class='sidebar-link'>
+                    <i class="far fa-address-book"></i>
+                        <span>Panduan</span>
                     </a>
                 </li>
             </ul>

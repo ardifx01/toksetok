@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Barang;
 use App\Models\RiwayatPengambilan;
+use App\Models\RiwayatPenambahan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Dompdf\Dompdf;
@@ -55,6 +56,13 @@ class BarangController extends Controller
             }
 
             $barang->save();
+
+            RiwayatPenambahan::create([
+                'barang_id' => $barang->id,
+                'jumlah' => $barang->stok,
+                'keterangan' => 'Penambahan stok baru',
+            ]);
+
             alert()->success('Sukses', 'Barang berhasil ditambahkan.');
         } catch (\Exception $e) {
             alert()->error('Error', 'Terjadi kesalahan saat menambahkan barang.');
@@ -72,6 +80,7 @@ class BarangController extends Controller
                 'gambar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             ]);
 
+            $stokLama = $barang->stok;
             $barang->nama_barang = $request->nama_barang;
             $barang->stok = $request->stok;
 
@@ -85,12 +94,36 @@ class BarangController extends Controller
             }
 
             $barang->save();
+
+            $perubahanStok = $barang->stok - $stokLama;
+            if ($perubahanStok > 0) {
+                $keterangan = 'Edit Tambah Stok';
+            } elseif ($perubahanStok < 0) {
+                $keterangan = 'Edit Kurangi Stok';
+            } else {
+                $keterangan = '-';
+            }
+
+            if ($perubahanStok != 0) {
+                RiwayatPenambahan::create([
+                    'barang_id' => $barang->id,
+                    'jumlah' => abs($perubahanStok),
+                    'keterangan' => $keterangan,
+                ]);
+            }
+
             alert()->success('Sukses', 'Barang berhasil diupdate.');
         } catch (\Exception $e) {
             alert()->error('Error', 'Terjadi kesalahan saat mengupdate barang.');
         }
 
         return redirect()->route('barang.index');
+    }
+    public function riwayatPenambahan(Request $request)
+    {
+        $riwayats = RiwayatPenambahan::with('barang')->orderBy('created_at', 'desc')->paginate(10);
+
+        return view('riwayat-penambahan', compact('riwayats'));
     }
 
     public function destroy(Barang $barang)

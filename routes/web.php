@@ -11,6 +11,7 @@ Route::delete('/barang/{barang}', [BarangController::class, 'destroy'])->name('b
 Route::patch('/barang/{barang}/update-stock', [BarangController::class, 'updateStock'])->name('barang.updateStock');
 Route::get('/riwayat/export', [BarangController::class, 'exportRiwayat'])->name('riwayat.export');
 Route::get('/riwayat', [BarangController::class, 'riwayat'])->name('riwayat.index');
+Route::get('/riwayatPenambahan', [BarangController::class, 'riwayatPenambahan'])->name('riwayats');
 Route::get('/search', [BarangController::class, 'search'])->name('barang.search');
 Route::get('/cari', [BarangController::class, 'cari'])->name('cari');
 Route::delete('/riwayat/hapus-terpilih', [BarangController::class, 'hapusTerpilihRiwayat'])->name('riwayat.hapusTerpilih');
