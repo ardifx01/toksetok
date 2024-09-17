@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Barang;
-use App\Models\RiwayatPengambilan;
-use App\Models\RiwayatPenambahan;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use App\Models\Barang;
+use Illuminate\Http\Request;
+use App\Models\RiwayatPenambahan;
+use App\Models\RiwayatPengambilan;
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Storage;
 
 class BarangController extends Controller
 {
