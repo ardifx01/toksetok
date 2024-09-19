@@ -156,6 +156,7 @@ class BarangController extends Controller
             RiwayatPengambilan::create([
                 'barang_id' => $barang->id,
                 'jumlah' => $request->stok,
+                'created_at' => now(),
             ]);
 
             alert()->success('Sukses', 'Barang berhasil diambil.');
