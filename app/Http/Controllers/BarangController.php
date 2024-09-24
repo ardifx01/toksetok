@@ -145,20 +145,39 @@ class BarangController extends Controller
 
     public function updateStock(Request $request, Barang $barang)
     {
+        // dd($request->all(), $barang);
         try {
+            // Validasi input
             $request->validate([
-                'stok' => 'required|integer|min:1',
+
+                'jumlah' => 'required|integer|min:1|max:' . $barang->stok,
+                'nama_penerima' => 'required|array', // validasi array nama penerima
+                'nama_penerima.*' => 'required|string|max:255', // validasi setiap nama penerima
+                'jenis_pengeluaran' => 'required|string',
+                'keterangan' => 'nullable|string',
             ]);
 
-            $barang->stok -= $request->stok;
+            // Mengurangi stok barang sesuai dengan jumlah yang diambil
+            $totalJumlah = $request->input('jumlah',1);
+            $barang->stok -= $totalJumlah;
             $barang->save();
 
-            RiwayatPengambilan::create([
-                'barang_id' => $barang->id,
-                'jumlah' => $request->stok,
-                'created_at' => now(),
-            ]);
+            // Menyimpan riwayat pengambilan barang per nama penerima
+            $namaPenerimaArray = $request->input('nama_penerima');
+            $namaPenerimaCount = array_count_values($namaPenerimaArray);
 
+            foreach ($namaPenerimaCount as $nama => $jumlah) {
+                RiwayatPengambilan::create([
+                    'barang_id' => $barang->id,
+                    'jumlah' => $jumlah,
+                    'nama_penerima' => $nama,
+                    'jenis_pengeluaran' => $request->input('jenis_pengeluaran'),
+                    'keterangan' => $request->input('keterangan'),
+                    'created_at' => now(),
+                ]);
+            }
+
+            // Memberikan notifikasi sukses
             alert()->success('Sukses', 'Barang berhasil diambil.');
         } catch (\Exception $e) {
             alert()->error('Error', 'Terjadi kesalahan saat mengambil barang.');
@@ -166,6 +185,7 @@ class BarangController extends Controller
 
         return redirect()->route('dashboard');
     }
+
 
     public function hapusTerpilihRiwayat(Request $request)
     {

@@ -8,9 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 class Barang extends Model
 {
     protected $fillable = ['nama_barang', 'stok', 'gambar'];
-     // Relasi ke RiwayatPenambahan
-     public function riwayatPenambahans()
-     {
-         return $this->hasMany(RiwayatPenambahan::class);
-     }
+    // Relasi ke RiwayatPenambahan
+    public function riwayatPenambahans()
+    {
+        return $this->hasMany(RiwayatPenambahan::class);
+    }
+    public function riwayatPengambilans()
+    {
+        return $this->hasMany(RiwayatPengambilan::class);
+    }
 }

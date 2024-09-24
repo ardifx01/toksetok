@@ -5,62 +5,62 @@
     <meta charset="UTF-8">
     <title>Riwayat Pengambilan Barang</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 0;
-        }
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        padding: 0;
+    }
 
-        h2,
-        h3 {
-            text-align: center;
-            color: #333;
-        }
+    h2,
+    h3 {
+        text-align: center;
+        color: #333;
+    }
 
-        .info-section {
-            margin-bottom: 30px;
-            border: 1px solid #ddd;
-            padding: 15px;
-            background-color: #f9f9f9;
-        }
+    .info-section {
+        margin-bottom: 30px;
+        border: 1px solid #ddd;
+        padding: 15px;
+        background-color: #f9f9f9;
+    }
 
-        .info-section h2 {
-            margin-bottom: 10px;
-        }
+    .info-section h2 {
+        margin-bottom: 10px;
+    }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
 
-        th,
-        td {
-            border: 1px solid #333;
-            padding: 8px;
-            text-align: left;
-            font-size: 12px;
-        }
+    th,
+    td {
+        border: 1px solid #333;
+        padding: 8px;
+        text-align: left;
+        font-size: 12px;
+    }
 
-        th {
-            background-color: #f2f2f2;
-        }
+    th {
+        background-color: #f2f2f2;
+    }
 
-        .summary-table {
-            width: 100%;
-            margin-bottom: 20px;
-        }
+    .summary-table {
+        width: 100%;
+        margin-bottom: 20px;
+    }
 
-        .summary-table th,
-        .summary-table td {
-            text-align: center;
-            padding: 10px;
-            border: 1px solid #ddd;
-        }
+    .summary-table th,
+    .summary-table td {
+        text-align: center;
+        padding: 10px;
+        border: 1px solid #ddd;
+    }
 
-        .summary-table th {
-            background-color: #f2f2f2;
-            font-weight: bold;
-        }
+    .summary-table th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+    }
     </style>
 </head>
 
@@ -94,7 +94,6 @@
                     <td>{{ $barang->stok }}</td>
                 </tr>
                 @php
-                // Menghitung total
                 $totalStokAwal += $barang->stok_awal;
                 $totalStokKeluar += $barang->stok_keluar;
                 $totalStokAkhir += $barang->stok;
@@ -115,15 +114,21 @@
             <tr>
                 <th>No</th>
                 <th>Nama Barang</th>
-                <th>Jumlah Ambil</th>
+                <th>Nama Penerima</th>
+                <th>Jenis</th>
+                <th>keterangan</th>
+                <th>Jumlah</th>
                 <th>Tanggal</th>
             </tr>
         </thead>
         <tbody>
-            @foreach ($riwayat as $index => $item)
+            @foreach ($riwayat as $item)
             <tr>
                 <td>{{ $index + 1 }}</td>
                 <td>{{ $item->barang->nama_barang }}</td>
+                <td>{{ $item->nama_penerima }}</td>
+                <td>{{ $item->jenis_pengeluaran }}</td>
+                <td>{{ $item->keterangan }}</td>
                 <td>{{ $item->jumlah }}</td>
                 <td>{{ $item->created_at->format('d-m-Y') }}</td>
             </tr>

@@ -9,8 +9,13 @@ class RiwayatPengambilan extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['barang_id', 'jumlah'];
-
+    protected $fillable = [
+        'barang_id',
+        'jumlah',
+        'nama_penerima',
+        'jenis_pengeluaran',
+        'keterangan',
+    ];
     /**
      * Get the barang that owns the riwayat pengambilan.
      */
@@ -19,5 +24,3 @@ class RiwayatPengambilan extends Model
         return $this->belongsTo(Barang::class);
     }
 }
-
-

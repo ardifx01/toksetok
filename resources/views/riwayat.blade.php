@@ -56,6 +56,9 @@
                     <th>No</th>
                     <th>Nama Barang</th>
                     <th>Jumlah</th>
+                    <th>Nama Penerima</th>
+                    <th>Jenis Pengeluaran</th>
+                    <th>Keterangan</th>
                     <th>Tanggal</th>
                 </tr>
             </thead>
@@ -68,6 +71,9 @@
                 <td>{{ $loop->iteration }}</td>
                 <td>{{ $riwayat->barang->nama_barang }}</td>
                 <td>{{ $riwayat->jumlah }}</td>
+                <td>{{ $riwayat->nama_penerima }}</td>
+                <td>{{ $riwayat->jenis_pengeluaran }}</td>
+                <td>{{ $riwayat->keterangan }}</td>
                 <td>{{ $riwayat->created_at->timezone('Asia/Jakarta')->format('d-m-Y H:i') }}</td>
             </tr>
             @endforeach
