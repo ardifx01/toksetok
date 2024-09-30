@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\RiwayatPenambahan;
 use App\Models\RiwayatPengambilan;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class BarangController extends Controller
@@ -158,7 +159,7 @@ class BarangController extends Controller
             ]);
 
             // Mengurangi stok barang sesuai dengan jumlah yang diambil
-            $totalJumlah = $request->input('jumlah',1);
+            $totalJumlah = $request->input('jumlah', 1);
             $barang->stok -= $totalJumlah;
             $barang->save();
 
@@ -262,4 +263,51 @@ class BarangController extends Controller
         $currentMonth = date('F_Y');
         return $pdf->stream("riwayat_pengambilan_{$currentMonth}.pdf");
     }
+    public function updateStockMulti(Request $request)
+    {
+        try {
+            // Validasi input
+            $request->validate([
+                'jumlah' => 'required|array', // validasi array jumlah
+                'jumlah.*' => 'required|integer|min:1', // validasi setiap jumlah
+                'nama_penerima' => 'required|string|max:255', // validasi sebagai string
+                'keterangan' => 'nullable|string',
+            ]);
+
+            // Ambil nama penerima dari input
+            $namaPenerima = $request->input('nama_penerima');
+
+            foreach ($request->input('jumlah') as $barangId => $jumlah) {
+                $barang = Barang::findOrFail($barangId);
+                if ($barang->stok < $jumlah) {
+                    alert()->error('Error', 'Stok tidak cukup untuk barang: ' . $barang->nama_barang);
+                    return redirect()->back();
+                }
+
+                // Mengurangi stok barang
+                $barang->stok -= $jumlah;
+                $barang->save();
+
+                // Menyimpan riwayat pengambilan barang dengan nama penerima yang sama
+                RiwayatPengambilan::create([
+                    'barang_id' => $barangId,
+                    'jumlah' => $jumlah,
+                    'nama_penerima' => $namaPenerima, // Menggunakan nama penerima yang sama
+                    'jenis_pengeluaran' => $request->input('jenis_pengeluaran'),
+                    'keterangan' => $request->input('keterangan'),
+                    'created_at' => now(),
+                ]);
+            }
+
+            alert()->success('Sukses', 'Barang berhasil diambil.');
+        } catch (\Exception $e) {
+            // Log the error message
+            Log::error('Error updating stock: ' . $e->getMessage());
+
+            alert()->error('Error', 'Terjadi kesalahan saat mengambil barang.');
+        }
+
+        return redirect()->route('dashboard');
+    }
+
 }

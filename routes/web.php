@@ -7,6 +7,7 @@ Route::get('/', [BarangController::class, 'index'])->name('dashboard');
 Route::get('/barang', [BarangController::class, 'manage'])->name('barang.index');
 Route::post('/barang', [BarangController::class, 'store'])->name('barang.store');
 Route::put('/barang/{barang}', [BarangController::class, 'update'])->name('barang.update');
+Route::post('/barang/update-stock-multi', [BarangController::class, 'updateStockMulti'])->name('barang.updateStockMulti');
 Route::delete('/barang/{barang}', [BarangController::class, 'destroy'])->name('barang.destroy');
 Route::patch('/barang/{barang}/update-stock', [BarangController::class, 'updateStock'])->name('barang.updateStock');
 Route::get('/riwayat/export', [BarangController::class, 'exportRiwayat'])->name('riwayat.export');
