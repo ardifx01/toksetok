@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Dompdf\Dompdf;
-use Dompdf\Options;
 use App\Models\Barang;
-use Illuminate\Http\Request;
 use App\Models\RiwayatPenambahan;
 use App\Models\RiwayatPengambilan;
+use Dompdf\Dompdf;
+use Dompdf\Options;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -148,22 +148,19 @@ class BarangController extends Controller
     {
         // dd($request->all(), $barang);
         try {
-            // Validasi input
             $request->validate([
 
                 'jumlah' => 'required|integer|min:1|max:' . $barang->stok,
-                'nama_penerima' => 'required|array', // validasi array nama penerima
-                'nama_penerima.*' => 'required|string|max:255', // validasi setiap nama penerima
+                'nama_penerima' => 'required|array',
+                'nama_penerima.*' => 'required|string|max:255',
                 'jenis_pengeluaran' => 'required|string',
                 'keterangan' => 'nullable|string',
             ]);
 
-            // Mengurangi stok barang sesuai dengan jumlah yang diambil
             $totalJumlah = $request->input('jumlah', 1);
             $barang->stok -= $totalJumlah;
             $barang->save();
 
-            // Menyimpan riwayat pengambilan barang per nama penerima
             $namaPenerimaArray = $request->input('nama_penerima');
             $namaPenerimaCount = array_count_values($namaPenerimaArray);
 
@@ -178,7 +175,6 @@ class BarangController extends Controller
                 ]);
             }
 
-            // Memberikan notifikasi sukses
             alert()->success('Sukses', 'Barang berhasil diambil.');
         } catch (\Exception $e) {
             alert()->error('Error', 'Terjadi kesalahan saat mengambil barang.');
@@ -186,7 +182,6 @@ class BarangController extends Controller
 
         return redirect()->route('dashboard');
     }
-
 
     public function hapusTerpilihRiwayat(Request $request)
     {
@@ -206,15 +201,6 @@ class BarangController extends Controller
 
         return redirect()->back();
     }
-
-    public function search(Request $request)
-    {
-        $query = $request->input('query');
-        $barangs = Barang::where('nama_barang', 'like', "%{$query}%")->get();
-
-        return view('dashboard', compact('barangs'));
-    }
-
     public function cari(Request $request)
     {
         $query = $request->input('query');
@@ -227,7 +213,6 @@ class BarangController extends Controller
         $month = $request->query('month', date('m'));
         $year = $request->query('year', date('Y'));
 
-        // Mengambil riwayat pengambilan berdasarkan bulan dan tahun
         $riwayats = RiwayatPengambilan::with('barang')
             ->whereMonth('created_at', $month)
             ->whereYear('created_at', $year)
@@ -266,15 +251,13 @@ class BarangController extends Controller
     public function updateStockMulti(Request $request)
     {
         try {
-            // Validasi input
             $request->validate([
-                'jumlah' => 'required|array', // validasi array jumlah
-                'jumlah.*' => 'required|integer|min:1', // validasi setiap jumlah
-                'nama_penerima' => 'required|string|max:255', // validasi sebagai string
+                'jumlah' => 'required|array',
+                'jumlah.*' => 'required|integer|min:1',
+                'nama_penerima' => 'required|string|max:255',
                 'keterangan' => 'nullable|string',
             ]);
 
-            // Ambil nama penerima dari input
             $namaPenerima = $request->input('nama_penerima');
 
             foreach ($request->input('jumlah') as $barangId => $jumlah) {
@@ -284,15 +267,13 @@ class BarangController extends Controller
                     return redirect()->back();
                 }
 
-                // Mengurangi stok barang
                 $barang->stok -= $jumlah;
                 $barang->save();
 
-                // Menyimpan riwayat pengambilan barang dengan nama penerima yang sama
                 RiwayatPengambilan::create([
                     'barang_id' => $barangId,
                     'jumlah' => $jumlah,
-                    'nama_penerima' => $namaPenerima, // Menggunakan nama penerima yang sama
+                    'nama_penerima' => $namaPenerima,
                     'jenis_pengeluaran' => $request->input('jenis_pengeluaran'),
                     'keterangan' => $request->input('keterangan'),
                     'created_at' => now(),
@@ -301,13 +282,21 @@ class BarangController extends Controller
 
             alert()->success('Sukses', 'Barang berhasil diambil.');
         } catch (\Exception $e) {
-            // Log the error message
             Log::error('Error updating stock: ' . $e->getMessage());
 
             alert()->error('Error', 'Terjadi kesalahan saat mengambil barang.');
         }
 
         return redirect()->route('dashboard');
+    }
+
+    public function search(Request $request)
+    {
+        if ($request->ajax()) {
+            $query = $request->input('query');
+            $barangs = Barang::where('nama_barang', 'like', "%{$query}%")->get();
+            return view('partials._barangList', compact('barangs'))->render();
+        }
     }
 
 }
