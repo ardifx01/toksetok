@@ -130,7 +130,7 @@
                 <td>{{ $item->jenis_pengeluaran }}</td>
                 <td>{{ $item->keterangan }}</td>
                 <td>{{ $item->jumlah }}</td>
-                <td>{{ $item->created_at->format('d-m-Y') }}</td>
+                <td>{{ $item->created_at->timezone('Asia/Jakarta')->format('d-m-Y - H:i') }}</td>
             </tr>
             @endforeach
         </tbody>

@@ -3,24 +3,21 @@
 
 @section('content')
 <div class="container py-4">
-    <!-- Tombol Hapus Barang Terpilih dan Cetak PDF -->
     <div class="d-flex justify-content-between mb-4">
-        <!-- Tombol Cetak PDF (di sebelah kiri) -->
-        <a href="{{ route('riwayat.export') }}" class="btn btn-primary"><i class="far fa-file-pdf"></i> PDF</a>
+        <a href="{{ route('riwayat.export', ['month' => $month, 'year' => $year]) }}" class="btn btn-primary">
+            <i class="far fa-file-pdf"></i> PDF
+        </a>
 
-        <!-- Tombol Hapus Barang Terpilih (hidden by default) -->
         <button type="button" id="deleteSelectedBtn" class="btn btn-danger" style="display: none;"
             onclick="document.getElementById('deleteForm').submit();"><i class="far fa-trash-alt"></i> Hapus</button>
     </div>
 
-    <!-- Form untuk hapus barang terpilih -->
     <form action="{{ route('riwayat.hapusTerpilih') }}" method="POST" id="deleteForm">
         @csrf
         @method('DELETE')
         <input type="hidden" name="items" id="deleteItems">
     </form>
 
-    <!-- Filter Bulan dan Tahun -->
     <div class="mb-4">
         <form action="{{ route('riwayat.index') }}" method="GET">
             <div class="d-flex align-items-center">
@@ -45,7 +42,6 @@
         </form>
     </div>
 
-    <!-- Tabel Riwayat Pengambilan Barang -->
     <div class="table-responsive">
         <table class="table table-striped table-bordered">
             <thead>

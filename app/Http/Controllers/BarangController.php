@@ -193,7 +193,13 @@ class BarangController extends Controller
                 return redirect()->back();
             }
 
-            RiwayatPengambilan::whereIn('id', json_decode($selectedItems))->delete();
+            $pengambilans = RiwayatPengambilan::whereIn('barang_id', RiwayatPenambahan::whereIn('id', $selectedItems)->pluck('barang_id'))->get();
+            if ($pengambilans->isNotEmpty()) {
+                alert()->error('Error', 'Riwayat pengambilan sudah tercatat, penghapusan tidak dapat dilakukan.');
+                return redirect()->back();
+            }
+
+            RiwayatPenambahan::whereIn('id', $selectedItems)->delete();
             alert()->success('Sukses', 'Riwayat terpilih berhasil dihapus.');
         } catch (\Exception $e) {
             alert()->error('Error', 'Terjadi kesalahan saat menghapus riwayat.');
@@ -201,6 +207,7 @@ class BarangController extends Controller
 
         return redirect()->back();
     }
+
     public function cari(Request $request)
     {
         $query = $request->input('query');
@@ -222,12 +229,16 @@ class BarangController extends Controller
         return view('riwayat', compact('riwayats', 'barangs', 'month', 'year'));
     }
 
-    public function exportRiwayat()
+    public function exportRiwayat(Request $request)
     {
-        $riwayat = RiwayatPengambilan::with('barang')->get();
+        $month = $request->query('month', date('m'));
+        $year = $request->query('year', date('Y'));
+        $riwayat = RiwayatPengambilan::with('barang')
+            ->whereMonth('created_at', $month)
+            ->whereYear('created_at', $year)
+            ->get();
 
         $barangs = Barang::all();
-
         foreach ($barangs as $barang) {
             $stokAwal = $barang->stok + RiwayatPengambilan::where('barang_id', $barang->id)->sum('jumlah');
             $stokKeluar = RiwayatPengambilan::where('barang_id', $barang->id)->sum('jumlah');
@@ -240,14 +251,15 @@ class BarangController extends Controller
         $options->set('defaultFont', 'Arial');
         $pdf = new Dompdf($options);
 
-        $html = view('pdf', compact('riwayat', 'barangs'))->render();
+        $html = view('pdf', compact('riwayat', 'barangs', 'month', 'year'))->render();
         $pdf->loadHtml($html);
         $pdf->setPaper('F4', 'portrait');
         $pdf->render();
 
-        $currentMonth = date('F_Y');
-        return $pdf->stream("riwayat_pengambilan_{$currentMonth}.pdf");
+        $currentMonthYear = \DateTime::createFromFormat('!m', $month)->format('F') . "_{$year}";
+        return $pdf->stream("riwayat_pengambilan_{$currentMonthYear}.pdf");
     }
+
     public function updateStockMulti(Request $request)
     {
         try {
@@ -298,5 +310,4 @@ class BarangController extends Controller
             return view('partials._barangList', compact('barangs'))->render();
         }
     }
-
 }
