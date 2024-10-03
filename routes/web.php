@@ -4,6 +4,7 @@ use App\Http\Controllers\BarangController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [BarangController::class, 'index'])->name('dashboard');
+Route::get('/panduan', [BarangController::class, 'panduan'])->name('panduans');
 Route::get('/barang', [BarangController::class, 'manage'])->name('barang.index');
 Route::post('/barang', [BarangController::class, 'store'])->name('barang.store');
 Route::put('/barang/{barang}', [BarangController::class, 'update'])->name('barang.update');

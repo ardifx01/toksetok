@@ -19,6 +19,10 @@ class BarangController extends Controller
         $barangs = Barang::all();
         return view('dashboard', compact('barangs'));
     }
+    public function panduan()
+    {
+        return view('panduan');
+    }
 
     public function manage(Request $request)
     {
