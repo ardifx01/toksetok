@@ -82,7 +82,7 @@ class BarangController extends Controller
         try {
             $request->validate([
                 'nama_barang' => 'required|string|max:255',
-                'stok' => 'required|integer|min:1',
+                'stok' => 'required|integer|min:0', // Ubah min:1 menjadi min:0
                 'gambar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             ]);
 
@@ -125,6 +125,50 @@ class BarangController extends Controller
 
         return redirect()->route('barang.index');
     }
+
+    public function updateStock(Request $request, Barang $barang)
+    {
+        try {
+            $request->validate([
+                'jumlah' => 'required|integer|min:1|max:' . $barang->stok,
+                'nama_penerima' => 'required|array',
+                'nama_penerima.*' => 'required|string|max:255',
+                'jenis_pengeluaran' => 'required|string',
+                'keterangan' => 'nullable|string',
+            ]);
+
+            $totalJumlah = $request->input('jumlah', 1);
+
+            // Pastikan stok tidak menjadi negatif
+            if ($totalJumlah > $barang->stok) {
+                throw new \Exception('Jumlah pengambilan melebihi stok yang tersedia');
+            }
+
+            $barang->stok -= $totalJumlah;
+            $barang->save();
+
+            $namaPenerimaArray = $request->input('nama_penerima');
+            $namaPenerimaCount = array_count_values($namaPenerimaArray);
+
+            foreach ($namaPenerimaCount as $nama => $jumlah) {
+                RiwayatPengambilan::create([
+                    'barang_id' => $barang->id,
+                    'jumlah' => $jumlah,
+                    'nama_penerima' => $nama,
+                    'jenis_pengeluaran' => $request->input('jenis_pengeluaran'),
+                    'keterangan' => $request->input('keterangan'),
+                    'created_at' => now(),
+                ]);
+            }
+
+            alert()->success('Sukses', 'Barang berhasil diambil.');
+        } catch (\Exception $e) {
+            alert()->error('Error', $e->getMessage());
+            return redirect()->back();
+        }
+
+        return redirect()->route('dashboard');
+    }
     public function riwayatPenambahan(Request $request)
     {
         $riwayats = RiwayatPenambahan::with('barang')->orderBy('created_at', 'desc')->paginate(10);
@@ -146,45 +190,6 @@ class BarangController extends Controller
         }
 
         return redirect()->route('barang.index');
-    }
-
-    public function updateStock(Request $request, Barang $barang)
-    {
-        // dd($request->all(), $barang);
-        try {
-            $request->validate([
-
-                'jumlah' => 'required|integer|min:1|max:' . $barang->stok,
-                'nama_penerima' => 'required|array',
-                'nama_penerima.*' => 'required|string|max:255',
-                'jenis_pengeluaran' => 'required|string',
-                'keterangan' => 'nullable|string',
-            ]);
-
-            $totalJumlah = $request->input('jumlah', 1);
-            $barang->stok -= $totalJumlah;
-            $barang->save();
-
-            $namaPenerimaArray = $request->input('nama_penerima');
-            $namaPenerimaCount = array_count_values($namaPenerimaArray);
-
-            foreach ($namaPenerimaCount as $nama => $jumlah) {
-                RiwayatPengambilan::create([
-                    'barang_id' => $barang->id,
-                    'jumlah' => $jumlah,
-                    'nama_penerima' => $nama,
-                    'jenis_pengeluaran' => $request->input('jenis_pengeluaran'),
-                    'keterangan' => $request->input('keterangan'),
-                    'created_at' => now(),
-                ]);
-            }
-
-            alert()->success('Sukses', 'Barang berhasil diambil.');
-        } catch (\Exception $e) {
-            alert()->error('Error', 'Terjadi kesalahan saat mengambil barang.');
-        }
-
-        return redirect()->route('dashboard');
     }
 
     public function hapusTerpilihRiwayat(Request $request)
