@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Barang;
-use App\Models\RiwayatPenambahan;
-use App\Models\RiwayatPengambilan;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use App\Models\Barang;
 use Illuminate\Http\Request;
+use App\Models\RiwayatPenambahan;
+use App\Models\RiwayatPengambilan;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
@@ -139,7 +140,6 @@ class BarangController extends Controller
 
             $totalJumlah = $request->input('jumlah', 1);
 
-            // Pastikan stok tidak menjadi negatif
             if ($totalJumlah > $barang->stok) {
                 throw new \Exception('Jumlah pengambilan melebihi stok yang tersedia');
             }
@@ -191,32 +191,41 @@ class BarangController extends Controller
 
         return redirect()->route('barang.index');
     }
-
     public function hapusTerpilihRiwayat(Request $request)
     {
         try {
-            $selectedItems = $request->input('items', []);
+            $validated = $request->validate([
+                'items' => 'required|array|min:1',
+                'items.*' => 'integer|exists:riwayat_penambahans,id'
+            ]);
 
-            if (empty($selectedItems)) {
-                alert()->info('Info', 'Tidak ada riwayat yang dipilih untuk dihapus.');
-                return redirect()->back();
-            }
+            DB::transaction(function () use ($validated) {
+                $deletedCount = RiwayatPenambahan::whereIn('id', $validated['items'])->delete();
 
-            $pengambilans = RiwayatPengambilan::whereIn('barang_id', RiwayatPenambahan::whereIn('id', $selectedItems)->pluck('barang_id'))->get();
-            if ($pengambilans->isNotEmpty()) {
-                alert()->error('Error', 'Riwayat pengambilan sudah tercatat, penghapusan tidak dapat dilakukan.');
-                return redirect()->back();
-            }
+                if ($deletedCount === 0) {
+                    throw new \Exception('Tidak ada riwayat yang berhasil dihapus.');
+                }
+            });
 
-            RiwayatPenambahan::whereIn('id', $selectedItems)->delete();
-            alert()->success('Sukses', 'Riwayat terpilih berhasil dihapus.');
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil menghapus riwayat terpilih.',
+                'count' => count($validated['items'])
+            ]);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => implode(' ', $e->validator->errors()->all())
+            ], 422);
         } catch (\Exception $e) {
-            alert()->error('Error', 'Terjadi kesalahan saat menghapus riwayat.');
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
         }
-
-        return redirect()->back();
     }
-
+    
     public function cari(Request $request)
     {
         $query = $request->input('query');
