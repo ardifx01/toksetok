@@ -225,7 +225,7 @@ class BarangController extends Controller
             ], 500);
         }
     }
-    
+
     public function cari(Request $request)
     {
         $query = $request->input('query');
@@ -241,7 +241,8 @@ class BarangController extends Controller
         $riwayats = RiwayatPengambilan::with('barang')
             ->whereMonth('created_at', $month)
             ->whereYear('created_at', $year)
-            ->get();
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
         $barangs = Barang::all();
 
         return view('riwayat', compact('riwayats', 'barangs', 'month', 'year'));
