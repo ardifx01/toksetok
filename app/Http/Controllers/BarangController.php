@@ -196,21 +196,24 @@ class BarangController extends Controller
         try {
             $validated = $request->validate([
                 'items' => 'required|array|min:1',
-                'items.*' => 'integer|exists:riwayat_penambahans,id'
+                'items.*' => 'integer|exists:riwayat_pengambilans,id'
             ]);
 
             DB::transaction(function () use ($validated) {
-                $deletedCount = RiwayatPenambahan::whereIn('id', $validated['items'])->delete();
+                $deletedCount = RiwayatPengambilan::whereIn('id', $validated['items'])->delete();
 
                 if ($deletedCount === 0) {
                     throw new \Exception('Tidak ada riwayat yang berhasil dihapus.');
                 }
             });
 
+            $redirectParams = $request->only(['month', 'year']);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Berhasil menghapus riwayat terpilih.',
-                'count' => count($validated['items'])
+                'count' => count($validated['items']),
+                'redirect_url' => route('riwayat.index', $redirectParams)
             ]);
 
         } catch (\Illuminate\Validation\ValidationException $e) {

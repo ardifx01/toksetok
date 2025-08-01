@@ -8,14 +8,14 @@
                 <i class="far fa-file-pdf"></i> PDF
             </a>
 
-            <button type="button" id="deleteSelectedBtn" class="btn btn-danger" style="display: none;"
-                onclick="document.getElementById('deleteForm').submit();"><i class="far fa-trash-alt"></i> Hapus</button>
+            <button type="button" id="deleteSelectedBtn" class="btn btn-danger" style="display: none;">
+                <i class="far fa-trash-alt"></i> Hapus
+            </button>
         </div>
 
         <form action="{{ route('riwayat.hapusTerpilih') }}" method="POST" id="deleteForm">
             @csrf
             @method('DELETE')
-            <input type="hidden" name="items" id="deleteItems">
         </form>
 
         <div class="mb-4">
@@ -60,21 +60,23 @@
                         <th>Tanggal</th>
                     </tr>
                 </thead>
-                @foreach($riwayats as $riwayat)
-                    <tr>
-                        <td>
-                            <input class="form-check-input item-checkbox" type="checkbox" value="{{ $riwayat->id }}"
-                                id="riwayat{{ $riwayat->id }}">
-                        </td>
-                        <td>{{ $loop->iteration }}</td>
-                        <td>{{ $riwayat->barang->nama_barang }}</td>
-                        <td>{{ $riwayat->jumlah }}</td>
-                        <td>{{ $riwayat->nama_penerima }}</td>
-                        <td>{{ $riwayat->jenis_pengeluaran }}</td>
-                        <td>{{ $riwayat->keterangan }}</td>
-                        <td>{{ $riwayat->created_at->timezone('Asia/Jakarta')->format('d-m-Y H:i') }}</td>
-                    </tr>
-                @endforeach
+                <tbody>
+                    @foreach($riwayats as $riwayat)
+                        <tr>
+                            <td>
+                                <input class="form-check-input item-checkbox" type="checkbox" value="{{ $riwayat->id }}"
+                                    id="riwayat{{ $riwayat->id }}">
+                            </td>
+                            <td>{{ $loop->iteration }}</td>
+                            <td>{{ $riwayat->barang->nama_barang }}</td>
+                            <td>{{ $riwayat->jumlah }}</td>
+                            <td>{{ $riwayat->nama_penerima }}</td>
+                            <td>{{ $riwayat->jenis_pengeluaran }}</td>
+                            <td>{{ $riwayat->keterangan }}</td>
+                            <td>{{ $riwayat->created_at->timezone('Asia/Jakarta')->format('d-m-Y H:i') }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
             </table>
             <div class="d-flex justify-content-center mt-4">
                 {{ $riwayats->links('pagination::bootstrap-5') }}
@@ -84,30 +86,121 @@
     </div>
 
     <script>
+        function getSelectedItems() {
+            return Array.from(document.querySelectorAll('.item-checkbox:checked')).map(checkbox => checkbox.value);
+        }
+
+        function toggleDeleteButton() {
+            document.getElementById('deleteSelectedBtn').style.display =
+                getSelectedItems().length > 0 ? 'block' : 'none';
+        }
+
         document.getElementById('selectAllCheckbox').addEventListener('change', function () {
-            let isChecked = this.checked;
-            document.querySelectorAll('.item-checkbox').forEach(function (checkbox) {
-                checkbox.checked = isChecked;
+            const checkboxes = document.querySelectorAll('.item-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
             });
             toggleDeleteButton();
         });
 
-        document.querySelectorAll('.item-checkbox').forEach(function (checkbox) {
-            checkbox.addEventListener('change', function () {
-                toggleDeleteButton();
-            });
+        document.querySelectorAll('.item-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', toggleDeleteButton);
         });
 
-        function toggleDeleteButton() {
-            let selectedItems = Array.from(document.querySelectorAll('input.item-checkbox:checked'));
-            document.getElementById('deleteSelectedBtn').style.display = selectedItems.length > 0 ? 'inline-block' : 'none';
-        }
+        document.getElementById('deleteSelectedBtn').addEventListener('click', function (e) {
+            e.preventDefault();
 
-        document.querySelector('button.btn-danger').addEventListener('click', function () {
-            let selectedItems = Array.from(document.querySelectorAll('input.item-checkbox:checked')).map(cb => cb
-                .value);
-            document.getElementById('deleteItems').value = JSON.stringify(selectedItems);
-            document.getElementById('deleteForm').submit();
+            const selectedItems = getSelectedItems();
+
+            if (selectedItems.length === 0) {
+                Swal.fire('Error', 'Tidak ada item yang dipilih', 'error');
+                return;
+            }
+
+            const form = document.createElement('form');
+            form.action = "{{ route('riwayat.hapusTerpilih') }}";
+            form.method = 'POST';
+
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_token';
+            csrfInput.value = "{{ csrf_token() }}";
+            form.appendChild(csrfInput);
+
+            const methodInput = document.createElement('input');
+            methodInput.type = 'hidden';
+            methodInput.name = '_method';
+            methodInput.value = 'DELETE';
+            form.appendChild(methodInput);
+
+            selectedItems.forEach(item => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'items[]';
+                input.value = item;
+                form.appendChild(input);
+            });
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const monthInput = document.createElement('input');
+            monthInput.type = 'hidden';
+            monthInput.name = 'month';
+            monthInput.value = urlParams.get('month') || '';
+            form.appendChild(monthInput);
+
+            const yearInput = document.createElement('input');
+            yearInput.type = 'hidden';
+            yearInput.name = 'year';
+            yearInput.value = urlParams.get('year') || '';
+            form.appendChild(yearInput);
+
+            document.body.appendChild(form);
+
+            Swal.fire({
+                title: 'Yakin ingin menghapus?',
+                text: `Anda akan menghapus ${selectedItems.length} item`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, Hapus!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: new FormData(form),
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        }
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    title: 'Berhasil!',
+                                    text: data.message,
+                                    icon: 'success',
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    window.location.href = data.redirect_url;
+                                });
+                            } else {
+                                Swal.fire('Error', data.message, 'error');
+                            }
+                        })
+                        .catch(error => {
+                            Swal.fire('Error', 'Terjadi kesalahan saat menghapus', 'error');
+                            console.error('Error:', error);
+                        })
+                        .finally(() => {
+                            document.body.removeChild(form);
+                        });
+                } else {
+                    document.body.removeChild(form);
+                }
+            });
         });
     </script>
 @endsection
