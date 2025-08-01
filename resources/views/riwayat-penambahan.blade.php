@@ -4,10 +4,7 @@
     <div class="container mt-5">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <form id="delete-form" method="POST" action="{{ route('riwayat.hapusTerpilih') }}">
-            @csrf
-            @method('DELETE')
-
+        <form id="delete-form">
             <div class="d-flex justify-content-between mb-4">
                 <button id="delete-button" type="button" class="btn btn-danger" data-bs-toggle="modal"
                     data-bs-target="#confirmDeleteModal" disabled>Hapus Terpilih</button>
@@ -67,6 +64,7 @@
         document.addEventListener('DOMContentLoaded', function () {
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
+            // Fungsi untuk toggle checkbox
             document.getElementById('select-all').addEventListener('change', function () {
                 const checkboxes = document.querySelectorAll('input[name="items[]"]');
                 checkboxes.forEach(checkbox => checkbox.checked = this.checked);
@@ -106,17 +104,18 @@
                 }
 
                 try {
-                    const response = await fetch("{{ route('riwayat.hapusTerpilih') }}", {
+                    const formData = new FormData();
+                    formData.append('_token', csrfToken);
+                    formData.append('_method', 'DELETE');
+                    selectedItems.forEach(item => formData.append('items[]', item));
+
+                    const response = await fetch("{{ route('riwayat.hapusTerpilihPenambahan') }}", {
                         method: 'POST',
+                        body: formData,
                         headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': csrfToken,
+                            'X-Requested-With': 'XMLHttpRequest',
                             'Accept': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            _method: 'DELETE',
-                            items: selectedItems
-                        })
+                        }
                     });
 
                     const data = await response.json();
@@ -136,7 +135,7 @@
                         Swal.fire({
                             icon: 'success',
                             title: 'Berhasil!',
-                            text: 'Berhasil menghapus ' + data.count + ' riwayat terpilih.',
+                            text: data.message,
                             confirmButtonColor: '#3085d6',
                             confirmButtonText: 'OK'
                         }).then((result) => {

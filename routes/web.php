@@ -18,3 +18,5 @@ Route::get('/search', [BarangController::class, 'search'])->name('barang.search'
 Route::get('/cari', [BarangController::class, 'cari'])->name('cari');
 Route::get('/search', [BarangController::class, 'search'])->name('barang.search');
 Route::delete('/riwayat/hapus-terpilih', [BarangController::class, 'hapusTerpilihRiwayat'])->name('riwayat.hapusTerpilih');
+Route::delete('/riwayat/hapus-terpilih-penambahan', [BarangController::class, 'hapusTerpilihPenambahan'])
+    ->name('riwayat.hapusTerpilihPenambahan');

@@ -229,6 +229,41 @@ class BarangController extends Controller
         }
     }
 
+    public function hapusTerpilihPenambahan(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'items' => 'required|array|min:1',
+                'items.*' => 'integer|exists:riwayat_penambahans,id'
+            ]);
+
+            DB::transaction(function () use ($validated) {
+                $deletedCount = RiwayatPenambahan::whereIn('id', $validated['items'])->delete();
+
+                if ($deletedCount === 0) {
+                    throw new \Exception('Tidak ada riwayat yang berhasil dihapus.');
+                }
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil menghapus riwayat terpilih.',
+                'count' => count($validated['items'])
+            ]);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => implode(' ', $e->validator->errors()->all())
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function cari(Request $request)
     {
         $query = $request->input('query');
