@@ -65,12 +65,12 @@
             @foreach ($barangs as $barang)
                 <div class="col">
                     <div
-                        class="card h-100 shadow border-0 rounded-3 overflow-hidden {{ $barang->stok < 4 ? 'border-danger' : '' }}">
+                        class="card h-100 shadow border-0 rounded-3 overflow-hidden {{ $barang->stok <= 4 ? 'border-danger' : '' }}">
                         <img src="{{ $barang->gambar ? asset('storage/barangs/' . $barang->gambar) : asset('assets/images/default.png') }}"
                             class="card-img-top img-fluid" alt="{{ $barang->nama_barang }}"
                             style="height: 200px; object-fit: cover;">
 
-                        @if ($barang->stok < 4 && $barang->stok > 0)
+                        @if ($barang->stok <= 4 && $barang->stok > 0)
                             <div class="position-absolute top-0 end-0 m-2">
                                 <span class="badge bg-warning text-dark">⚠️ Stok Rendah</span>
                             </div>
@@ -79,7 +79,7 @@
                         <div class="card-body d-flex flex-column">
                             <h5 class="card-title text-primary text-truncate fw-bold">{{ $barang->nama_barang }}</h5>
                             <p class="card-text mb-1">Stok:
-                                <span class="fw-bold {{ $barang->stok < 4 ? 'text-danger' : 'text-success' }}">
+                                <span class="fw-bold {{ $barang->stok <= 4 ? 'text-danger' : 'text-success' }}">
                                     {{ $barang->stok }}
                                 </span>
                             </p>
