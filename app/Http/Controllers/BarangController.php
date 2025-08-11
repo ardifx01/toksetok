@@ -18,7 +18,9 @@ class BarangController extends Controller
     public function index()
     {
         $barangs = Barang::all();
-        return view('dashboard', compact('barangs'));
+        $lowStockItems = $barangs->where('stok', '<=', 4);
+
+        return view('dashboard', compact('barangs', 'lowStockItems'));
     }
     public function panduan()
     {
@@ -215,7 +217,6 @@ class BarangController extends Controller
                 'count' => count($validated['items']),
                 'redirect_url' => route('riwayat.index', $redirectParams)
             ]);
-
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
@@ -250,7 +251,6 @@ class BarangController extends Controller
                 'message' => 'Berhasil menghapus riwayat terpilih.',
                 'count' => count($validated['items'])
             ]);
-
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,

@@ -1,0 +1,67 @@
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+.animate__slideInRight {
+    animation: slideInRight 0.5s ease-out;
+}
+
+.animate__fadeOutRight {
+    animation: fadeOutRight 1s ease-in;
+}
+
+.animate__pulse {
+    animation: pulse 0.5s ease-in-out;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+.low-stock-items::-webkit-scrollbar {
+    width: 4px;
+}
+
+.low-stock-items::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+}
+
+.low-stock-items::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.3);
+    border-radius: 2px;
+}
+
+.low-stock-items::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.5);
+}
+
+
+.border-danger {
+    border: 2px solid #dc3545 !important;
+    box-shadow: 0 0 10px rgba(220, 53, 69, 0.3) !important;
+}
+
+#ambilBarangBtn.sticky-top {
+                top: 20px;
+            }
