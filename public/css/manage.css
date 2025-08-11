@@ -7,3 +7,20 @@
     background-color: rgba(220, 53, 69, 0.15) !important;
 }
 
+.table-responsive {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.table thead th {
+    position: sticky;
+    top: 0;
+    background-color: #435ebe;
+    z-index: 10;
+}
+
+/* Untuk semua mode */
+.table.table-dark-mode thead.thead-dark th {
+    background-color: #435ebe !important;
+    color: white !important;
+}
