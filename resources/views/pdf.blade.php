@@ -61,6 +61,12 @@
         background-color: #f2f2f2;
         font-weight: bold;
     }
+
+    /* Style untuk stok rendah */
+    .low-stock-text {
+        color: #d32f2f !important;
+        font-weight: bold;
+    }
     </style>
 </head>
 
@@ -91,7 +97,9 @@
                     <td>{{ $barang->nama_barang }}</td>
                     <td>{{ $barang->stok_awal }}</td>
                     <td>{{ $barang->stok_keluar }}</td>
-                    <td>{{ $barang->stok }}</td>
+                    <td>
+                        <span class="{{ $barang->stok < 5 ? 'low-stock-text' : '' }}">{{ $barang->stok }}</span>
+                    </td>
                 </tr>
                 @php
                 $totalStokAwal += $barang->stok_awal;
@@ -124,7 +132,7 @@
         <tbody>
             @foreach ($riwayat as $item)
             <tr>
-                <td>{{ $index + 1 }}</td>
+                <td>{{ $loop->iteration }}</td>
                 <td>{{ $item->barang->nama_barang }}</td>
                 <td>{{ $item->nama_penerima }}</td>
                 <td>{{ $item->jenis_pengeluaran }}</td>
