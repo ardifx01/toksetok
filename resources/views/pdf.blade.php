@@ -5,74 +5,81 @@
     <meta charset="UTF-8">
     <title>Riwayat Pengambilan Barang</title>
     <style>
-    body {
-        font-family: Arial, sans-serif;
-        margin: 20px;
-        padding: 0;
-    }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+        }
 
-    h2,
-    h3 {
-        text-align: center;
-        color: #333;
-    }
+        h2,
+        h3 {
+            text-align: center;
+            color: #333;
+        }
 
-    .info-section {
-        margin-bottom: 30px;
-        border: 1px solid #ddd;
-        padding: 15px;
-        background-color: #f9f9f9;
-    }
+        .info-section {
+            margin-bottom: 30px;
+            border: 1px solid #ddd;
+            padding: 15px;
+            background-color: #f9f9f9;
+        }
 
-    .info-section h2 {
-        margin-bottom: 10px;
-    }
+        .info-section h2 {
+            margin-bottom: 10px;
+        }
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
 
-    th,
-    td {
-        border: 1px solid #333;
-        padding: 8px;
-        text-align: left;
-        font-size: 12px;
-    }
+        th,
+        td {
+            border: 1px solid #333;
+            padding: 8px;
+            text-align: left;
+            font-size: 12px;
+        }
 
-    th {
-        background-color: #f2f2f2;
-    }
+        th {
+            background-color: #f2f2f2;
+        }
 
-    .summary-table {
-        width: 100%;
-        margin-bottom: 20px;
-    }
+        .summary-table {
+            width: 100%;
+            margin-bottom: 20px;
+        }
 
-    .summary-table th,
-    .summary-table td {
-        text-align: center;
-        padding: 10px;
-        border: 1px solid #ddd;
-    }
+        .summary-table th,
+        .summary-table td {
+            text-align: center;
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
 
-    .summary-table th {
-        background-color: #f2f2f2;
-        font-weight: bold;
-    }
+        .summary-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
 
-    /* Style untuk stok rendah */
-    .low-stock-text {
-        color: #d32f2f !important;
-        font-weight: bold;
-    }
+        /* Style untuk stok rendah */
+        .low-stock-text {
+            color: #d32f2f !important;
+            font-weight: bold;
+        }
     </style>
 </head>
 
 <body>
 
     <h2>Laporan Stok & Riwayat Pengambilan</h2>
+    <p style="text-align: center; margin-bottom: 15px;">
+        Periode:
+        {{ \Carbon\Carbon::createFromDate($year, $month, 1)->startOfMonth()->translatedFormat('d F Y') }}
+        s/d
+        {{ \Carbon\Carbon::createFromDate($year, $month, 1)->endOfMonth()->translatedFormat('d F Y') }}
+    </p>
+
     <div class="info-section">
         <h3>Ringkasan Stok Barang</h3>
         <table class="summary-table">
@@ -87,25 +94,25 @@
             </thead>
             <tbody>
                 @php
-                $totalStokAwal = 0;
-                $totalStokKeluar = 0;
-                $totalStokAkhir = 0;
+                    $totalStokAwal = 0;
+                    $totalStokKeluar = 0;
+                    $totalStokAkhir = 0;
                 @endphp
                 @foreach ($barangs as $index => $barang)
-                <tr>
-                    <td>{{ $index + 1 }}</td>
-                    <td>{{ $barang->nama_barang }}</td>
-                    <td>{{ $barang->stok_awal }}</td>
-                    <td>{{ $barang->stok_keluar }}</td>
-                    <td>
-                        <span class="{{ $barang->stok < 5 ? 'low-stock-text' : '' }}">{{ $barang->stok }}</span>
-                    </td>
-                </tr>
-                @php
-                $totalStokAwal += $barang->stok_awal;
-                $totalStokKeluar += $barang->stok_keluar;
-                $totalStokAkhir += $barang->stok;
-                @endphp
+                    <tr>
+                        <td>{{ $index + 1 }}</td>
+                        <td>{{ $barang->nama_barang }}</td>
+                        <td>{{ $barang->stok_awal }}</td>
+                        <td>{{ $barang->stok_keluar }}</td>
+                        <td>
+                            <span class="{{ $barang->stok < 5 ? 'low-stock-text' : '' }}">{{ $barang->stok }}</span>
+                        </td>
+                    </tr>
+                    @php
+                        $totalStokAwal += $barang->stok_awal;
+                        $totalStokKeluar += $barang->stok_keluar;
+                        $totalStokAkhir += $barang->stok;
+                    @endphp
                 @endforeach
                 <tr class="total-row">
                     <th colspan="2">Total Keseluruhan</th>
@@ -131,15 +138,15 @@
         </thead>
         <tbody>
             @foreach ($riwayat as $item)
-            <tr>
-                <td>{{ $loop->iteration }}</td>
-                <td>{{ $item->barang->nama_barang }}</td>
-                <td>{{ $item->nama_penerima }}</td>
-                <td>{{ $item->jenis_pengeluaran }}</td>
-                <td>{{ $item->keterangan }}</td>
-                <td>{{ $item->jumlah }}</td>
-                <td>{{ $item->created_at->timezone('Asia/Jakarta')->format('d-m-Y - H:i') }}</td>
-            </tr>
+                <tr>
+                    <td>{{ $loop->iteration }}</td>
+                    <td>{{ $item->barang->nama_barang }}</td>
+                    <td>{{ $item->nama_penerima }}</td>
+                    <td>{{ $item->jenis_pengeluaran }}</td>
+                    <td>{{ $item->keterangan }}</td>
+                    <td>{{ $item->jumlah }}</td>
+                    <td>{{ $item->created_at->timezone('Asia/Jakarta')->format('d-m-Y - H:i') }}</td>
+                </tr>
             @endforeach
         </tbody>
     </table>
