@@ -67,7 +67,14 @@
             color: #d32f2f !important;
             font-weight: bold;
         }
+
+        .center-text th,
+        .center-text td {
+            text-align: center;
+            vertical-align: middle;
+        }
     </style>
+
 </head>
 
 <body>
@@ -123,33 +130,38 @@
             </tbody>
         </table>
     </div>
-    <h3>Riwayat Pengambilan Barang</h3>
-    <table>
+
+    {{-- Mulai halaman baru untuk PDF --}}
+    <div style="page-break-before: always;"></div>
+
+    <h3 style="text-align: center;">Riwayat Pengambilan Barang</h3>
+    <table class="center-text" style="width:100%; border-collapse: collapse;">
         <thead>
             <tr>
                 <th>No</th>
-                <th>Nama Barang</th>
-                <th>Nama Penerima</th>
-                <th>Jenis</th>
-                <th>keterangan</th>
-                <th>Jumlah</th>
                 <th>Tanggal</th>
+                <th>Nama Penerima</th>
+                <th>Nama Barang</th>
+                <th>Jenis</th>
+                <th>Keterangan</th>
+                <th>Jumlah</th>
             </tr>
         </thead>
         <tbody>
             @foreach ($riwayat as $item)
                 <tr>
                     <td>{{ $loop->iteration }}</td>
-                    <td>{{ $item->barang->nama_barang }}</td>
+                    <td>{{ $item->created_at->timezone('Asia/Jakarta')->format('d-m-Y - H:i') }}</td>
                     <td>{{ $item->nama_penerima }}</td>
+                    <td>{{ $item->barang->nama_barang }}</td>
                     <td>{{ $item->jenis_pengeluaran }}</td>
                     <td>{{ $item->keterangan }}</td>
                     <td>{{ $item->jumlah }}</td>
-                    <td>{{ $item->created_at->timezone('Asia/Jakarta')->format('d-m-Y - H:i') }}</td>
                 </tr>
             @endforeach
         </tbody>
     </table>
+
 
 </body>
 
